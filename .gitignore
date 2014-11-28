@@ -1,0 +1,7 @@
+pkg
+# no Gemfile.lock
+*.lock
+.ruby-version
+*.gem
+target
+build.log
