@@ -5,10 +5,7 @@ require 'fileutils'
 
 module FileDependencies
   module File
-    extend self
-
     def fetch(url, sha1, output)
-
       puts "Downloading #{url}"
       actual_sha1 = download(url, output)
 
@@ -16,14 +13,14 @@ module FileDependencies
         fail "SHA1 does not match (expected '#{sha1}' but got '#{actual_sha1}')"
       end
     end # def fetch
+    module_function :fetch
 
     def calc_sha1(path)
-
       digest = Digest::SHA1.new
       fd = ::File.new(path, "r")
       while true
         begin
-          digest << fd.sysread(16384)
+          digest << fd.sysread(16_384)
         rescue EOFError
           break
         end
@@ -31,10 +28,11 @@ module FileDependencies
       return digest.hexdigest
     ensure
       fd.close if fd
-    end # def calc_fingerprint
+    end # def calc_sha1
+    module_function :calc_sha1
 
     def fetch_file(url, sha1, target)
-      filename = ::File.basename( URI(url).path )
+      filename = ::File.basename(URI(url).path)
       output = "#{target}/#{filename}"
       begin
         actual_sha1 = calc_sha1(output)
@@ -46,6 +44,7 @@ module FileDependencies
       end
       return output
     end
+    module_function :fetch_file
 
     def download(url, output)
       uri = URI(url)
@@ -63,7 +62,7 @@ module FileDependencies
               digest << chunk
               if size > 0 && $stdout.tty?
                 count += chunk.bytesize
-                $stdout.write(sprintf("\r%0.2f%%", count/size * 100))
+                $stdout.write(sprintf("\r%0.2f%%", count / size * 100))
               end
             end
           end
@@ -80,6 +79,6 @@ module FileDependencies
     ensure
       ::File.unlink(tmp) if ::File.exist?(tmp)
     end # def download
-
+    module_function :download
   end
 end

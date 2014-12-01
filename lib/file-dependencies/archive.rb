@@ -3,10 +3,7 @@ require "fileutils"
 
 module FileDependencies
   module Archive
-    extend self
-
     def ungzip(file, outdir)
-
       output = ::File.join(outdir, file.gsub('.gz', '').split("/").last)
       tgz = Zlib::GzipReader.new(::File.open(file))
       begin
@@ -16,10 +13,11 @@ module FileDependencies
         ::File.unlink(file)
       rescue
         ::File.unlink(output) if ::File.file?(output)
-       raise
+        raise
       end
       tgz.close
     end
+    module_function :ungzip
 
     def untar(tarball, &block)
       tgz = Zlib::GzipReader.new(::File.open(tarball))
@@ -37,7 +35,7 @@ module FileDependencies
           FileUtils.mkdir_p(path) unless ::File.directory?(path)
         else
           entry_mode = entry.instance_eval { @mode } & 0777
-          if ::File.exists?(path)
+          if ::File.exist?(path)
             stat = ::File.stat(path)
             # TODO(sissel): Submit a patch to archive-tar-minitar upstream to
             # expose headers in the entry.
@@ -53,10 +51,10 @@ module FileDependencies
             # IO.copy_stream to throw "can't convert nil into String" on JRuby
             # TODO(sissel): File a bug about this.
             while !entry.eof?
-              chunk = entry.read(16384)
+              chunk = entry.read(16_384)
               fd.write(chunk)
             end
-              #IO.copy_stream(entry, fd)
+            # IO.copy_stream(entry, fd)
           end
           ::File.chmod(entry_mode, path)
         end
@@ -64,6 +62,7 @@ module FileDependencies
       tar.close
       ::File.unlink(tarball) if ::File.file?(tarball)
     end # def untar
+    module_function :untar
 
     def eval_file(entry, files, prefix)
       # Avoid tarball headers
@@ -83,6 +82,6 @@ module FileDependencies
         entry.full_name.gsub(prefix, '')
       end
     end
-
+    module_function :eval_file
   end
 end

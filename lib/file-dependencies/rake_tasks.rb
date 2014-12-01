@@ -9,4 +9,3 @@ namespace "vendor" do
   end
 
 end
-

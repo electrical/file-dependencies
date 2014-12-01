@@ -1,10 +1,11 @@
 #-*- mode: ruby -*-
+require File.expand_path('../lib/file-dependencies/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name = 'file-dependencies'
-  s.version = "0.1.0"
+  s.version = APP_VERSION
   s.author = 'Richard Pijnenburg'
-  s.email = [ 'richard.pijnenburg@elasticsearch.com' ]
+  s.email = ['richard.pijnenburg@elasticsearch.com']
   s.summary = 'manage file dependencies for gems'
   s.homepage = 'https://github.com/electrical/file-dependencies'
 
@@ -12,7 +13,7 @@ Gem::Specification.new do |s|
 
   s.executable = 'file-deps'
 
-  s.files = `git ls-files`.split($\)
+  s.files = `git ls-files`.split($ORS)
 
   s.description = 'manage file dependencies for gems'
 
