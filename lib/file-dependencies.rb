@@ -2,6 +2,7 @@ require 'file-dependencies/file'
 require 'file-dependencies/archive'
 require 'json'
 require 'tmpdir'
+require 'fileutils'
 
 module FileDependencies
   extend self
@@ -31,6 +32,8 @@ module FileDependencies
         end
       elsif download =~ /.gz/
         FileDependencies::Archive.ungzip(download, target)
+      else
+        FileUtils.mv(download, ::File.join(target, download.split("/").last))
       end
     end
   end # def download
