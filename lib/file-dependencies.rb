@@ -1,8 +1,6 @@
-require 'file-dependencies/version'
 require 'file-dependencies/file'
 require 'file-dependencies/archive'
 require 'json'
-require 'fileutils'
 
 module FileDependencies
   extend self
@@ -13,6 +11,8 @@ module FileDependencies
       vendor_file_content = IO.read(vendor_file)
       file_list = Json.load(vendor_file_content)
       FileDependencies.download(file_list, ::File.join(dir, target))
+    else
+      puts "vendor.json not found, looked for the file at #{vendor_file}"
     end
   end # def process_vendor
 
