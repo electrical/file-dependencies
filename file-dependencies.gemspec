@@ -10,15 +10,13 @@ Gem::Specification.new do |s|
 
   s.license = 'APACHE 2.0'
 
-  s.executable = 'TODO'
+  s.executable = 'file-deps'
 
-  s.files = Dir[ 'lib/*rb' ]
-  s.files += [ 'Readme.md', 'file-dependencies.gemspec']
+  s.files = `git ls-files`.split($\)
 
   s.description = 'manage file dependencies for gems'
 
   s.add_runtime_dependency 'minitar'
-  s.add_runtime_dependency 'fileutils'
 
   s.add_development_dependency 'rake', '~> 10.2'
 end

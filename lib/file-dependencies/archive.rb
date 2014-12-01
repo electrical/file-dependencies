@@ -5,30 +5,30 @@ module FileDependencies
   module Archive
     extend self
 
-    def ungzip(file)
+    def ungzip(file, outdir)
 
-      outpath = file.gsub('.gz', '')
+      output = ::File.join(outdir, file.gsub('.gz', '').split("/").last)
       tgz = Zlib::GzipReader.new(::File.open(file))
       begin
-        ::File.open(outpath, "w") do |out|
+        ::File.open(output, "w") do |out|
           IO::copy_stream(tgz, out)
         end
         ::File.unlink(file)
       rescue
-        ::File.unlink(outpath) if ::File.file?(outpath)
+        ::File.unlink(output) if ::File.file?(output)
        raise
       end
       tgz.close
     end
 
     def untar(tarball, &block)
-      tgz = Zlib::GzipReader.new(File.open(tarball))
+      tgz = Zlib::GzipReader.new(::File.open(tarball))
       # Pull out typesdb
-      tar = Archive::Tar::Minitar::Input.open(tgz)
+      tar = ::Archive::Tar::Minitar::Input.open(tgz)
       tar.each do |entry|
         path = block.call(entry)
         next if path.nil?
-        parent = File.dirname(path)
+        parent = ::File.dirname(path)
 
         FileUtils.mkdir_p(parent) unless ::File.directory?(parent)
 
