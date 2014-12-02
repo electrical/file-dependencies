@@ -8,7 +8,7 @@ module FileDependencies
       tgz = Zlib::GzipReader.new(::File.open(file))
       begin
         ::File.open(output, "w") do |out|
-          IO::copy_stream(tgz, out)
+          IO.copy_stream(tgz, out)
         end
         ::File.unlink(file)
       rescue
@@ -50,7 +50,7 @@ module FileDependencies
             # IO object. Something about empty files in this EntryStream causes
             # IO.copy_stream to throw "can't convert nil into String" on JRuby
             # TODO(sissel): File a bug about this.
-            while !entry.eof?
+            until entry.eof?
               chunk = entry.read(16_384)
               fd.write(chunk)
             end

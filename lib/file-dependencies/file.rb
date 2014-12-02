@@ -6,7 +6,6 @@ require 'tmpdir'
 
 module FileDependencies
   module File
-
     SHA1_REGEXP = /(\b[0-9a-f]{40}\b)/
 
     def validate_sha1(local_file, remote_sha1)
@@ -21,7 +20,7 @@ module FileDependencies
         end
       else
         file = download(remote_sha1, Dir.tmpdir)
-        sha1 = IO.read(file).gsub("\n",'')
+        sha1 = IO.read(file).gsub("\n", '')
         if sha1.match(SHA1_REGEXP)
           local_sha1 = calc_sha1(local_file)
           if sha1 == local_sha1
@@ -39,7 +38,7 @@ module FileDependencies
     def calc_sha1(path)
       digest = Digest::SHA1.new
       fd = ::File.new(path, "r")
-      while true
+      loop do
         begin
           digest << fd.sysread(16_384)
         rescue EOFError
@@ -56,9 +55,7 @@ module FileDependencies
       puts "Downloading #{url}"
 
       file = download(url, target)
-      if validate_sha1(file, sha1)
-        return file
-      end
+      return file if validate_sha1(file, sha1)
     end
     module_function :fetch_file
 
