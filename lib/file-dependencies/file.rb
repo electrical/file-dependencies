@@ -2,18 +2,39 @@ require "digest/sha1"
 require "net/http"
 require "uri"
 require 'fileutils'
+require 'tmpdir'
 
 module FileDependencies
   module File
-    def fetch(url, sha1, output)
-      puts "Downloading #{url}"
-      actual_sha1 = download(url, output)
 
-      if actual_sha1 != sha1
-        fail "SHA1 does not match (expected '#{sha1}' but got '#{actual_sha1}')"
+    SHA1_REGEXP = /(\b[0-9a-f]{5,40}\b)/
+
+    def validate_sha1(local_file, remote_sha1)
+      return true if remote_sha1 == 'none'
+
+      if remote_sha1.match(SHA1_REGEXP)
+        local_sha1 = calc_sha1(local_file)
+        if remote_sha1 == local_sha1
+          return true
+        else
+          raise("SHA1 did not match. Expected #{remote_sha1} but computed #{local_sha1}")
+        end
+      else
+        file = download(remote_sha1, Dir.tmpdir)
+        sha1 = IO.read(file).gsub("\n",'')
+        if sha1.match(SHA1_REGEXP)
+          local_sha1 = calc_sha1(local_file)
+          if sha1 == local_sha1
+            return true
+          else
+            raise("SHA1 did not match. Expected #{sha1} but computed #{local_sha1}")
+          end
+        else
+          raise("invalid SHA1 signature in #{remote_sha1}")
+        end
       end
-    end # def fetch
-    module_function :fetch
+    end
+    module_function :validate_sha1
 
     def calc_sha1(path)
       digest = Digest::SHA1.new
@@ -28,27 +49,22 @@ module FileDependencies
       return digest.hexdigest
     ensure
       fd.close if fd
-    end # def calc_sha1
+    end # def calc__local_sha1
     module_function :calc_sha1
 
     def fetch_file(url, sha1, target)
-      filename = ::File.basename(URI(url).path)
-      output = "#{target}/#{filename}"
-      begin
-        actual_sha1 = calc_sha1(output)
-        if actual_sha1 != sha1
-          fetch(url, sha1, output)
-        end
-      rescue Errno::ENOENT
-        fetch(url, sha1, output)
+      puts "Downloading #{url}"
+
+      file = download(url, target)
+      if validate_sha1(file, sha1)
+        return file
       end
-      return output
     end
     module_function :fetch_file
 
-    def download(url, output)
+    def download(url, target)
       uri = URI(url)
-      digest = Digest::SHA1.new
+      output = "#{target}/#{::File.basename(uri.path)}"
       tmp = "#{output}.tmp"
       Net::HTTP.start(uri.host, uri.port, :use_ssl => (uri.scheme == "https")) do |http|
         request = Net::HTTP::Get.new(uri.path)
@@ -59,7 +75,6 @@ module FileDependencies
           ::File.open(tmp, "w") do |fd|
             response.read_body do |chunk|
               fd.write(chunk)
-              digest << chunk
               if size > 0 && $stdout.tty?
                 count += chunk.bytesize
                 $stdout.write(sprintf("\r%0.2f%%", count / size * 100))
@@ -72,7 +87,7 @@ module FileDependencies
 
       ::File.rename(tmp, output)
 
-      return digest.hexdigest
+      return output
     rescue SocketError => e
       puts "Failure while downloading #{url}: #{e}"
       raise
