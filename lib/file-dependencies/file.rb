@@ -7,7 +7,7 @@ require 'tmpdir'
 module FileDependencies
   module File
 
-    SHA1_REGEXP = /(\b[0-9a-f]{5,40}\b)/
+    SHA1_REGEXP = /(\b[0-9a-f]{40}\b)/
 
     def validate_sha1(local_file, remote_sha1)
       return true if remote_sha1 == 'none'
