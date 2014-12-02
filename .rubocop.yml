@@ -47,3 +47,6 @@ RedundantReturn:
 # enable/disable.
 CaseIndentation:
   Enabled: false
+
+Style/FileName:
+  Enabled: false

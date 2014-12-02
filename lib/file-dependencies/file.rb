@@ -5,6 +5,7 @@ require 'fileutils'
 require 'tmpdir'
 
 module FileDependencies
+  # :nodoc:
   module File
     SHA1_REGEXP = /(\b[0-9a-f]{40}\b)/
 
@@ -21,18 +22,15 @@ module FileDependencies
       else
         file = download(remote_sha1, Dir.tmpdir)
         sha1 = IO.read(file).gsub("\n", '')
-        if sha1.match(SHA1_REGEXP)
-          local_sha1 = calc_sha1(local_file)
-          if sha1 == local_sha1
-            return true
-          else
-            raise("SHA1 did not match. Expected #{sha1} but computed #{local_sha1}")
-          end
+        raise("invalid SHA1 signature in #{remote_sha1}") unless sha1.match(SHA1_REGEXP)
+        local_sha1 = calc_sha1(local_file)
+        if sha1 == local_sha1
+          return true
         else
-          raise("invalid SHA1 signature in #{remote_sha1}")
+          raise("SHA1 did not match. Expected #{sha1} but computed #{local_sha1}")
         end
       end
-    end
+    end # def validate_sha1
     module_function :validate_sha1
 
     def calc_sha1(path)
@@ -48,7 +46,7 @@ module FileDependencies
       return digest.hexdigest
     ensure
       fd.close if fd
-    end # def calc__local_sha1
+    end # def calc__sha1
     module_function :calc_sha1
 
     def fetch_file(url, sha1, target)
@@ -56,7 +54,7 @@ module FileDependencies
 
       file = download(url, target)
       return file if validate_sha1(file, sha1)
-    end
+    end # def fetch_file
     module_function :fetch_file
 
     def download(url, target)

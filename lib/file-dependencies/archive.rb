@@ -2,6 +2,7 @@ require "archive/tar/minitar"
 require "fileutils"
 
 module FileDependencies
+  # :nodoc:
   module Archive
     def ungzip(file, outdir)
       output = ::File.join(outdir, file.gsub('.gz', '').split("/").last)
@@ -67,19 +68,15 @@ module FileDependencies
     def eval_file(entry, files, prefix)
       # Avoid tarball headers
       return false if entry.full_name =~ /PaxHeaders/
+      return entry.full_name.gsub(prefix, '') if files.nil?
 
-      if !files.nil?
-        if files.is_a?(Array)
-          # Extract specific files given
-          return false unless files.include?(entry.full_name.gsub(prefix, ''))
-          entry.full_name.split("/").last
-        elsif files.is_a?(String)
-          return false unless entry.full_name =~ Regexp.new(files)
-          entry.full_name.split("/").last
-        end
-      else
-        # Extract all files 
-        entry.full_name.gsub(prefix, '')
+      if files.is_a?(Array)
+        # Extract specific files given
+        return false unless files.include?(entry.full_name.gsub(prefix, ''))
+        entry.full_name.split("/").last
+      elsif files.is_a?(String)
+        return false unless entry.full_name =~ Regexp.new(files)
+        entry.full_name.split("/").last
       end
     end
     module_function :eval_file

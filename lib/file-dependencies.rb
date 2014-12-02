@@ -3,7 +3,7 @@ require 'file-dependencies/archive'
 require 'json'
 require 'tmpdir'
 require 'fileutils'
-
+# :nodoc:
 module FileDependencies
   def process_vendor(dir, target = 'vendor', tmpdir = Dir.tmpdir)
     vendor_file = ::File.join(dir, 'vendor.json')

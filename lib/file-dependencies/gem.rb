@@ -1,6 +1,6 @@
 require 'json'
-
 module FileDependencies
+  # :nodoc:
   module Gem
     def hook
       Gem.post_install do |gem_installer|
