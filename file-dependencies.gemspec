@@ -20,6 +20,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'minitar'
 
   s.add_development_dependency 'rake', '~> 10.2'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'stud'
 end
 
 # vim: syntax=Ruby
