@@ -9,43 +9,32 @@ module FileDependencies
   module File
     SHA1_REGEXP = /(\b[0-9a-f]{40}\b)/
 
-    def validate_sha1(local_file, remote_sha1)
-      return true if remote_sha1 == 'none'
-
-      if remote_sha1.match(SHA1_REGEXP)
-        local_sha1 = calc_sha1(local_file)
-        if remote_sha1 == local_sha1
-          return true
-        else
-          raise("SHA1 did not match. Expected #{remote_sha1} but computed #{local_sha1}")
-        end
-      else
+    def fetch_sha1(remote_sha1)
+      unless URI(remote_sha1.to_s).scheme.nil?
         file = download(remote_sha1, Dir.tmpdir)
         sha1 = IO.read(file).gsub("\n", '')
-        raise("invalid SHA1 signature in #{remote_sha1}") unless sha1.match(SHA1_REGEXP)
-        local_sha1 = calc_sha1(local_file)
-        if sha1 == local_sha1
-          return true
-        else
-          raise("SHA1 did not match. Expected #{sha1} but computed #{local_sha1}")
-        end
+      else
+        sha1 = remote_sha1
+      end
+      raise("invalid SHA1 signature. Got '#{sha1}'") unless sha1.match(SHA1_REGEXP)
+      sha1
+    end
+
+    def validate_sha1(local_file, remote_sha1)
+      return true if remote_sha1 == 'none'
+      sha1 = fetch_sha1(remote_sha1)
+      local_sha1 = calc_sha1(local_file)
+
+      if sha1 == local_sha1
+        return true
+      else
+        raise("SHA1 did not match. Expected #{sha1} but computed #{local_sha1}")
       end
     end # def validate_sha1
     module_function :validate_sha1
 
     def calc_sha1(path)
-      digest = Digest::SHA1.new
-      fd = ::File.new(path, "r")
-      loop do
-        begin
-          digest << fd.sysread(16_384)
-        rescue EOFError
-          break
-        end
-      end
-      return digest.hexdigest
-    ensure
-      fd.close if fd
+      Digest::SHA1.file(path).hexdigest
     end # def calc__sha1
     module_function :calc_sha1
 
