@@ -1,4 +1,3 @@
-require 'stringio'
 require 'stud/temporary'
 
 module Assist
@@ -26,14 +25,14 @@ module Assist
 
     file = "#{Stud::Temporary.pathname}.gz"
     Zlib::GzipWriter.open(file) do |gz|
-      gz.write content
+      gz.write(content)
     end
     file
   end
 
   def self.generate_file(content)
-    file = "#{::Stud::Temporary.pathname}"
-    File.open(file, 'w') { |file| file.write(content) }
+    file = Stud::Temporary.pathname
+    File.write(file, content)
     file
   end
 end
