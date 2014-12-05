@@ -44,7 +44,7 @@ module FileDependencies
             # If file sizes are same, skip writing.
             next if stat.size == entry_size && (stat.mode & 0777) == entry_mode
           end
-          puts "Extracting #{entry.full_name} from #{tarball} #{entry_mode.to_s(8)}"
+          puts "Extracting #{entry.full_name} from #{tarball} #{entry_mode.to_s(8)}" if $DEBUG
           ::File.open(path, "w") do |fd|
             # eof? check lets us skip empty files. Necessary because the API provided by
             # Archive::Tar::Minitar::Reader::EntryStream only mostly acts like an
