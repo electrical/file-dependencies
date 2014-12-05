@@ -3,7 +3,7 @@ require 'stud/temporary'
 
 module Assist
 
-  def generate_tarball(files)
+  def self.generate_tarball(files)
     tarpath = "#{Stud::Temporary.pathname}.tar.gz"
     tarfile = File.new(tarpath, "wb")
     gz = Zlib::GzipWriter.new(tarfile, Zlib::BEST_COMPRESSION)
@@ -22,7 +22,7 @@ module Assist
     tarpath
   end
 
-  def generate_gzip(content)
+  def self.generate_gzip(content)
 
     file = "#{Stud::Temporary.pathname}.gz"
     Zlib::GzipWriter.open(file) do |gz|

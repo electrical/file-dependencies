@@ -19,6 +19,7 @@ module FileDependencies
       raise("invalid SHA1 signature. Got '#{sha1}'") unless sha1.match(SHA1_REGEXP)
       sha1
     end
+    module_function :fetch_sha1
 
     def validate_sha1(local_file, remote_sha1)
       return true if remote_sha1 == 'none'
