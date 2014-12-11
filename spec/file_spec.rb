@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'tmpdir'
 require 'file-dependencies/file'
-
+include WebMock::API
 describe FileDependencies::File do
 
 
@@ -17,7 +17,7 @@ describe FileDependencies::File do
     end
 
     it 'raises an error when the file doesnt exist' do
-      expect { FileDependencies::File.calc_sha1('dont_exist')}.to(raise_error)
+      expect { FileDependencies::File.calc_sha1('dont_exist')}.to(raise_error(Errno::ENOENT))
     end
   end
 
@@ -37,7 +37,7 @@ describe FileDependencies::File do
 
       it 'raises error when invalid' do
         remote_sha1 = '778164c23fae5935176254d2550619cba8abc263'
-        expect { FileDependencies::File.validate_sha1(file, remote_sha1) }.to(raise_error)
+        expect { FileDependencies::File.validate_sha1(file, remote_sha1) }.to(raise_error(RuntimeError))
       end
 
     end
@@ -109,9 +109,33 @@ describe FileDependencies::File do
 
       it 'raises error when sha1 string is invalid' do
         expect(FileDependencies::File).to receive(:download).with(remote_sha1, Dir.tmpdir).and_return(sha1file1)
-        expect { FileDependencies::File.fetch_sha1(remote_sha1) }.to(raise_error)
+        expect { FileDependencies::File.fetch_sha1(remote_sha1) }.to(raise_error(RuntimeError))
       end
 
+    end
+  end
+
+  describe ".download" do
+
+    let(:tmpdir) { Stud::Temporary.directory }
+    url = 'http://www.example.com/somefile'
+    url2 = 'http://www.example.com/somefile2'
+    url3 = 'http://www.example.com/somefile3'
+    file = Assist.generate_file('778164c23fae5935176254d2550619cba8abc262')
+    before { stub_request(:get, url).to_return(:body => File.new(file), :status => 200) }
+
+    it 'returns the path to the file downloaded' do
+      expect(FileDependencies::File.download(url, tmpdir)).to(eq(File.join(tmpdir, 'somefile')))
+    end
+
+    before { stub_request(:get, url2).to_return(:status => 404) }
+    it 'raises an error if the file does not exist' do
+      expect { FileDependencies::File.download(url2, tmpdir) }.to(raise_error(RuntimeError))
+    end
+
+    before { stub_request(:get, url3).to_timeout }
+    it 'raises an error on timeout' do
+      expect { FileDependencies::File.download(url3, tmpdir) }.to(raise_error(Timeout::Error))
     end
 
   end
