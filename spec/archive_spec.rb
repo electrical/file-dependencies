@@ -22,7 +22,7 @@ describe FileDependencies::Archive do
 
     let(:expected_file) { Assist.generate_file('some_content') }
     it 'raises error extracting non gz file' do
-      expect { FileDependencies::Archive.ungzip(expected_file, tmpdir) }.to(raise_error)
+      expect { FileDependencies::Archive.ungzip(expected_file, tmpdir) }.to(raise_error(Zlib::GzipFile::Error))
     end
   end
 
@@ -66,7 +66,7 @@ describe FileDependencies::Archive do
         FileDependencies::Archive.untar(file) do |entry|
           ::File.join(tmpdir, entry.full_name)
         end
-      end.to(raise_error)
+      end.to(raise_error(Zlib::GzipFile::Error))
     end
   end
 

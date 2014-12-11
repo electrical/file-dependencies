@@ -54,7 +54,7 @@ module FileDependencies
       Net::HTTP.start(uri.host, uri.port, :use_ssl => (uri.scheme == "https")) do |http|
         request = Net::HTTP::Get.new(uri.path)
         http.request(request) do |response|
-          fail "HTTP fetch failed for #{url}. #{response}" if [200, 301].include?(response.code)
+          raise("HTTP fetch failed for #{url}. #{response}") unless [200, 301].include?(response.code.to_i)
           size = (response["content-length"].to_i || -1).to_f
           count = 0
           ::File.open(tmp, "w") do |fd|
