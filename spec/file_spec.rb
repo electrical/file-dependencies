@@ -117,11 +117,16 @@ describe FileDependencies::File do
 
   describe ".download" do
 
+    after do
+      FileUtils.remove_entry_secure(tmpdir)
+      FileUtils.remove_entry_secure(file)
+    end
+
     let(:tmpdir) { Stud::Temporary.directory }
     url = 'http://www.example.com/somefile'
     url2 = 'http://www.example.com/somefile2'
     url3 = 'http://www.example.com/somefile3'
-    file = Assist.generate_file('778164c23fae5935176254d2550619cba8abc262')
+    let(:file) {Assist.generate_file('778164c23fae5935176254d2550619cba8abc262') }
     before { stub_request(:get, url).to_return(:body => File.new(file), :status => 200) }
 
     it 'returns the path to the file downloaded' do
