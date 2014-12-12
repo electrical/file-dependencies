@@ -30,7 +30,7 @@ describe FileDependencies::File do
     describe "with a sha1 string" do
 
       let(:file) { Assist.generate_file('some_content') }
-      it 'returns true when sha11 comparing is valid' do
+      it 'returns true when sha1 comparing is valid' do
         remote_sha1 = '778164c23fae5935176254d2550619cba8abc262'
         expect(FileDependencies::File.validate_sha1(file, remote_sha1)).to(be_truthy)
       end
@@ -64,7 +64,7 @@ describe FileDependencies::File do
       let(:sha1file2) { Assist.generate_file('778164c23fae5935176254d2550619cba8abc263') }
       let(:remote_sha1) { 'http://example.com/sha1file' }
 
-      it 'returns true when sha11 comparing is valid' do
+      it 'returns true when sha1 comparing is valid' do
         expect(FileDependencies::File).to receive(:download).with(remote_sha1, Dir.tmpdir).and_return(sha1file)
         expect(FileDependencies::File.validate_sha1(file, remote_sha1)).to(be_truthy)
       end
@@ -126,9 +126,9 @@ describe FileDependencies::File do
     url = 'http://www.example.com/somefile'
     url2 = 'http://www.example.com/somefile2'
     url3 = 'http://www.example.com/somefile3'
-    let(:file) {Assist.generate_file('778164c23fae5935176254d2550619cba8abc262') }
-    before { stub_request(:get, url).to_return(:body => File.new(file), :status => 200) }
+    let(:file) { Assist.generate_file('778164c23fae5935176254d2550619cba8abc262') }
 
+    before { stub_request(:get, url).to_return(:body => File.new(file), :status => 200) }
     it 'returns the path to the file downloaded' do
       expect(FileDependencies::File.download(url, tmpdir)).to(eq(File.join(tmpdir, 'somefile')))
     end
