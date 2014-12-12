@@ -124,23 +124,21 @@ describe FileDependencies::File do
 
     let(:tmpdir) { Stud::Temporary.directory }
     url = 'http://www.example.com/somefile'
-    url2 = 'http://www.example.com/somefile2'
-    url3 = 'http://www.example.com/somefile3'
     let(:file) { Assist.generate_file('778164c23fae5935176254d2550619cba8abc262') }
 
-    before { stub_request(:get, url).to_return(:body => File.new(file), :status => 200) }
     it 'returns the path to the file downloaded' do
+      stub_request(:get, url).to_return(:body => File.new(file), :status => 200)
       expect(FileDependencies::File.download(url, tmpdir)).to(eq(File.join(tmpdir, 'somefile')))
     end
 
-    before { stub_request(:get, url2).to_return(:status => 404) }
     it 'raises an error if the file does not exist' do
-      expect { FileDependencies::File.download(url2, tmpdir) }.to(raise_error(RuntimeError))
+      stub_request(:get, url).to_return(:status => 404)
+      expect { FileDependencies::File.download(url, tmpdir) }.to(raise_error(RuntimeError))
     end
 
-    before { stub_request(:get, url3).to_timeout }
     it 'raises an error on timeout' do
-      expect { FileDependencies::File.download(url3, tmpdir) }.to(raise_error(Timeout::Error))
+      stub_request(:get, url).to_timeout
+      expect { FileDependencies::File.download(url, tmpdir) }.to(raise_error(Timeout::Error))
     end
 
   end
