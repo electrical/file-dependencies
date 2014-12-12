@@ -40,7 +40,7 @@ module FileDependencies
     module_function :calc_sha1
 
     def fetch_file(url, sha1, target)
-      puts "Downloading #{url}"
+      puts "Downloading #{url}" if $DEBUG
 
       file = download(url, target)
       return file if validate_sha1(file, sha1)
