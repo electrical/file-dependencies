@@ -15,13 +15,13 @@ describe FileDependencies::Archive do
     let(:expected_file) { gzipfile.gsub('.gz','') }
     let(:tmpdir) { Stud::Temporary.directory }
 
-    it 'does not raise an error with correct file'do
+    it 'decompresses a gzip file'do
       expect { FileDependencies::Archive.ungzip(gzipfile, tmpdir) }.to_not(raise_error)
       expect(File.exist?(expected_file))
     end
 
     let(:expected_file) { Assist.generate_file('some_content') }
-    it 'raises error extracting non gz file' do
+    it 'raises error extracting non gzip file' do
       expect { FileDependencies::Archive.ungzip(expected_file, tmpdir) }.to(raise_error(Zlib::GzipFile::Error))
     end
   end
@@ -43,8 +43,8 @@ describe FileDependencies::Archive do
       FileDependencies::Archive.untar(tarball) do |entry|
         ::File.join(tmpdir, entry.full_name)
       end
-      found_files = Dir.glob(File.join(tmpdir, '**', '*')).reject! { |entry| File.directory?(entry) }.sort!
-      expected_files = entries.map! { |k| "#{tmpdir}/#{k}" }.sort!
+      found_files = Dir.glob(File.join(tmpdir, '**', '*')).reject { |entry| File.directory?(entry) }.sort
+      expected_files = entries.map { |k| ::File.join(tmpdir, k) }.sort
       expect(expected_files).to(eq(found_files))
     end
 
@@ -56,8 +56,8 @@ describe FileDependencies::Archive do
           ::File.join(tmpdir, entry.full_name)
         end
       end
-      found_files = Dir.glob(File.join(tmpdir, '**', '*')).reject! { |entry| File.directory?(entry) }.sort!
-      expected_files = entries.map! { |k| "#{tmpdir}/#{k}" }.sort!
+      found_files = Dir.glob(File.join(tmpdir, '**', '*')).reject { |entry| File.directory?(entry) }.sort
+      expected_files = entries.map { |k| "#{tmpdir}/#{k}" }.sort
       expect(expected_files).to(eq(found_files))
     end
 
@@ -90,26 +90,17 @@ describe FileDependencies::Archive do
     let(:expect3) { [ '/some/dir/somefile', '/somefile', '/some/other/file', '/some/jars/file1.jar', '/some/jars/file2.jar', '/other/jars/file3.jar' ] }
 
     it 'returns all files based on a wildcard' do
-      filelist = []
-      entries.each do |entry|
-        filelist << FileDependencies::Archive.eval_file(entry, extract1, prefix)
-      end
+      filelist = entries.map { |entry| FileDependencies::Archive.eval_file(entry, extract1, prefix) }
       expect(filelist.reject{ |v| v == false}.sort).to(eq(expect1.sort))
     end
 
     it 'returns all files based on an array' do
-      filelist = []
-      entries.each do |entry|
-        filelist << FileDependencies::Archive.eval_file(entry, extract2, prefix)
-      end
+      filelist = entries.map { |entry| FileDependencies::Archive.eval_file(entry, extract2, prefix) }
       expect(filelist.reject{ |v| v == false}.sort).to(eq(expect2.sort))
     end
 
     it 'returns all files when no extracted files are given' do
-      filelist = []
-      entries.each do |entry|
-        filelist << FileDependencies::Archive.eval_file(entry, extract3, prefix)
-      end
+      filelist = entries.map { |entry| FileDependencies::Archive.eval_file(entry, extract3, prefix) }
       expect(filelist.reject{ |v| v == false}.sort).to(eq(expect3.sort))
     end
 
