@@ -26,11 +26,8 @@ module FileDependencies
       sha1 = fetch_sha1(remote_sha1)
       local_sha1 = calc_sha1(local_file)
 
-      if sha1 == local_sha1
-        return true
-      else
-        raise("SHA1 did not match. Expected #{sha1} but computed #{local_sha1}")
-      end
+      raise("SHA1 did not match. Expected #{sha1} but computed #{local_sha1}") if sha1 != local_sha1
+      true
     end # def validate_sha1
     module_function :validate_sha1
 

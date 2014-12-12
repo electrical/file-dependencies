@@ -7,11 +7,9 @@ describe FileDependencies do
 
   describe '.download' do
     after do
-      FileUtils.remove_entry_secure(tmpdir)
-      FileUtils.remove_entry_secure(target)
-      FileUtils.remove_entry_secure(file1)
-      FileUtils.remove_entry_secure(file2)
-      FileUtils.remove_entry_secure(file3)
+      [tmpdir, target, file1, file2, file3].each do |entry|
+        FileUtils.remove_entry_secure(entry)
+      end
     end
 
     let(:tmpdir) { Stud::Temporary.directory }
@@ -51,11 +49,9 @@ describe FileDependencies do
 
   describe '.process_vendor' do
     after do
-      FileUtils.remove_entry_secure(tmpdir)
-      FileUtils.remove_entry_secure(target)
-      FileUtils.remove_entry_secure(file1)
-      FileUtils.remove_entry_secure(file2)
-      FileUtils.remove_entry_secure(file3)
+      [tmpdir, target, file1, file2, file3].each do |entry|
+        FileUtils.remove_entry_secure(entry)
+      end
     end
 
     let(:tmpdir) { Stud::Temporary.directory }
