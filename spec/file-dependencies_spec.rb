@@ -2,6 +2,7 @@ require 'spec_helper'
 require 'tmpdir'
 require 'json'
 require 'file-dependencies'
+
 include WebMock::API
 describe FileDependencies do
 
@@ -30,9 +31,9 @@ describe FileDependencies do
     let(:url3) { 'http://www.example.com/somefile3.gz' }
     let(:url4) { 'http://www.example.com/somefile4.tar.gz' }
 
-    let(:entries) { ['somefile2.txt', 'somefile3', 'some/file', 'some/other/file', 'other', 'some.jar', 'someother.jar'] }
+    let(:entries) { ['somefile2.txt', 'somefile3', 'some/file', 'some/other/file', 'other', 'jars/some.jar', 'jars/someother.jar'] }
 
-    let(:files) { [ { 'url' => url1, 'sha1' => sha1 }, { 'url' => url2, 'sha1' => sha2 }, { 'url' => url3, 'sha1' => sha3 }, { 'url' => url4, 'sha1' => sha4, 'extract' => '.jar' } ] }
+    let(:files) { [ { 'url' => url1, 'sha1' => sha1 }, { 'url' => url2, 'sha1' => sha2 }, { 'url' => url3, 'sha1' => sha3 }, { 'url' => url4, 'sha1' => sha4, 'extract' => '.jar', 'target' => 'jars' } ] }
 
     it 'processes file list' do
       stub_request(:get, url1).to_return(:body => File.new(file1), :status => 200)
@@ -76,9 +77,9 @@ describe FileDependencies do
     let(:url3) { 'http://www.example.com/somefile3.gz' }
     let(:url4) { 'http://www.example.com/somefile4.tar.gz' }
 
-    let(:files) { [ { 'url' => url1, 'sha1' => sha1 }, { 'url' => url2, 'sha1' => sha2 }, { 'url' => url3, 'sha1' => sha3 }, { 'url' => url4, 'sha1' => sha4, 'extract' => '.jar' } ].to_json }
+    let(:files) { [ { 'url' => url1, 'sha1' => sha1 }, { 'url' => url2, 'sha1' => sha2 }, { 'url' => url3, 'sha1' => sha3 }, { 'url' => url4, 'sha1' => sha4, 'extract' => '.jar', 'target' => 'jars' } ].to_json }
     let(:vendorfile) { File.write(File.join(target, 'vendor.json'), files) }
-    let(:entries) { ['somefile2.txt', 'somefile3', 'some/file', 'some/other/file', 'other', 'some.jar', 'someother.jar'] }
+    let(:entries) { ['somefile2.txt', 'somefile3', 'some/file', 'some/other/file', 'other', 'jars/some.jar', 'jars/someother.jar'] }
 
     it 'processes the vendor.json file' do
       stub_request(:get, url1).to_return(:body => File.new(file1), :status => 200)

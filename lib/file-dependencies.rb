@@ -20,6 +20,7 @@ module FileDependencies
   def download(files, target, tmpdir)
     FileUtils.mkdir_p(target) unless ::File.directory?(target)
     files.each do |file|
+      target = ::File.join(target, file['target']) if !file['target'].nil?
       download = FileDependencies::File.fetch_file(file['url'], file['sha1'], tmpdir)
       if (res = download.match(/(\S+?)(\.tar\.gz|\.tgz)/))
         prefix = res.captures.first.gsub("#{tmpdir}/", '')
