@@ -24,7 +24,7 @@ module FileDependencies
       if (res = download.match(/(\S+?)(\.tar\.gz|\.tgz)/))
         prefix = res.captures.first.gsub("#{tmpdir}/", '')
         FileDependencies::Archive.untar(download) do |entry|
-          next unless (out = FileDependencies::Archive.eval_file(entry, file['files'], prefix))
+          next unless (out = FileDependencies::Archive.eval_file(entry, file['extract'], prefix))
           ::File.join(target, out)
         end
       elsif download =~ /.gz/
