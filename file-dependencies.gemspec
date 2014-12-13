@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'stud'
   s.add_development_dependency 'webmock'
   s.add_development_dependency 'coveralls'
+  s.add_development_dependency 'codeclimate-test-reporter'
 end
 
 # vim: syntax=Ruby
