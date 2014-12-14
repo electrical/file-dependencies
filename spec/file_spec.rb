@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'tmpdir'
 require 'file-dependencies/file'
 include WebMock::API
 describe FileDependencies::File do

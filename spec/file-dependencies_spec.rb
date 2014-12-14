@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'tmpdir'
 require 'json'
 require 'file-dependencies'
 

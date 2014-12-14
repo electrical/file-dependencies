@@ -22,7 +22,6 @@ module FileDependencies
 
     def untar(tarball, &block)
       tgz = Zlib::GzipReader.new(::File.open(tarball))
-      # Pull out typesdb
       tar = ::Archive::Tar::Minitar::Input.open(tgz)
       tar.each do |entry|
         path = block.call(entry)
@@ -66,19 +65,19 @@ module FileDependencies
     module_function :untar
 
     def eval_file(entry, files, prefix)
-      # Avoid tarball headers
-      return false if entry =~ /PaxHeaders/
-      return entry.gsub(prefix, '') if files.nil?
-
+      return false if tar_header?(entry)
       if files.is_a?(Array)
-        # Extract specific files given
-        return false unless files.include?(entry.gsub(prefix, ''))
-        entry.split("/").last
+        return true if files.include?(entry.gsub(prefix, ''))
       elsif files.is_a?(String)
-        return false unless entry =~ Regexp.new(files)
-        entry.split("/").last
+        return true if entry =~ Regexp.new(files)
       end
+      false
     end
     module_function :eval_file
+
+    def tar_header?(entry)
+      entry =~ /PaxHeaders/
+    end
+    module_function :tar_header?
   end
 end
