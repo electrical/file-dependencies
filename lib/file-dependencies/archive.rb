@@ -67,16 +67,16 @@ module FileDependencies
 
     def eval_file(entry, files, prefix)
       # Avoid tarball headers
-      return false if entry.full_name =~ /PaxHeaders/
-      return entry.full_name.gsub(prefix, '') if files.nil?
+      return false if entry =~ /PaxHeaders/
+      return entry.gsub(prefix, '') if files.nil?
 
       if files.is_a?(Array)
         # Extract specific files given
-        return false unless files.include?(entry.full_name.gsub(prefix, ''))
-        entry.full_name.split("/").last
+        return false unless files.include?(entry.gsub(prefix, ''))
+        entry.split("/").last
       elsif files.is_a?(String)
-        return false unless entry.full_name =~ Regexp.new(files)
-        entry.full_name.split("/").last
+        return false unless entry =~ Regexp.new(files)
+        entry.split("/").last
       end
     end
     module_function :eval_file
