@@ -10,11 +10,11 @@ module FileDependencies
     SHA1_REGEXP = /(\b[0-9a-f]{40}\b)/
 
     def fetch_sha1(remote_sha1)
-      unless URI(remote_sha1.to_s).scheme.nil?
+      if URI(remote_sha1.to_s).scheme.nil?
+        sha1 = remote_sha1
+      else
         file = download(remote_sha1, Dir.tmpdir)
         sha1 = IO.read(file).gsub("\n", '')
-      else
-        sha1 = remote_sha1
       end
       raise("invalid SHA1 signature. Got '#{sha1}'") unless sha1.match(SHA1_REGEXP)
       sha1

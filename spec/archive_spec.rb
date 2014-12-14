@@ -12,7 +12,7 @@ describe FileDependencies::Archive do
       FileUtils.remove_entry_secure(tmpdir)
     end
     let(:gzipfile) { Assist.generate_gzip('some_content') }
-    let(:expected_file) { gzipfile.gsub('.gz','') }
+    let(:expected_file) { gzipfile.gsub('.gz', '') }
     let(:tmpdir) { Stud::Temporary.directory }
 
     it 'decompresses a gzip file'do
@@ -34,11 +34,11 @@ describe FileDependencies::Archive do
     end
 
     let(:file) { Assist.generate_file('some_content') }
-    let(:tarball) { Assist.generate_tarball({'some/file' => 'content1', 'some/other/file' => 'content2', 'other' => 'content3'}) }
+    let(:tarball) { Assist.generate_tarball('some/file' => 'content1', 'some/other/file' => 'content2', 'other' => 'content3') }
     let(:tmpdir) { Stud::Temporary.directory }
 
     it 'extracts a full tarball' do
-      entries = ['some/file', 'some/other/file', 'other' ]
+      entries = ['some/file', 'some/other/file', 'other']
 
       FileDependencies::Archive.untar(tarball) do |entry|
         ::File.join(tmpdir, entry.full_name)
@@ -79,29 +79,29 @@ describe FileDependencies::Archive do
       end
     end
 
-    let(:entries) { [ 'sometar/PaxHeaders', 'sometar/some/dir/PaxHeaders', 'sometar/some/dir/somefile', 'sometar/somefile', 'sometar/some/other/file', 'sometar/some/jars/file1.jar', 'sometar/some/jars/file2.jar', 'sometar/other/jars/file3.jar' ]}
+    let(:entries) { ['sometar/PaxHeaders', 'sometar/some/dir/PaxHeaders', 'sometar/some/dir/somefile', 'sometar/somefile', 'sometar/some/other/file', 'sometar/some/jars/file1.jar', 'sometar/some/jars/file2.jar', 'sometar/other/jars/file3.jar'] }
     let(:prefix) { 'sometar' }
 
-    let(:extract1) { '.jars' } #wildcard
-    let(:expect1) { [ 'file1.jar', 'file2.jar', 'file3.jar'] }
-    let(:extract2) { ['/some/other/file', '/somefile', '/other/jars/file3.jar' ]}
-    let(:expect2) { ['file', 'somefile', 'file3.jar' ]}
-    let(:extract3) { }
-    let(:expect3) { [ '/some/dir/somefile', '/somefile', '/some/other/file', '/some/jars/file1.jar', '/some/jars/file2.jar', '/other/jars/file3.jar' ] }
+    let(:extract1) { '.jars' }
+    let(:expect1)  { ['file1.jar', 'file2.jar', 'file3.jar'] }
+    let(:extract2) { ['/some/other/file', '/somefile', '/other/jars/file3.jar'] }
+    let(:expect2)  { ['file', 'somefile', 'file3.jar'] }
+    let(:extract3) {}
+    let(:expect3)  { ['/some/dir/somefile', '/somefile', '/some/other/file', '/some/jars/file1.jar', '/some/jars/file2.jar', '/other/jars/file3.jar'] }
 
     it 'returns all files based on a wildcard' do
       filelist = entries.map { |entry| FileDependencies::Archive.eval_file(entry, extract1, prefix) }
-      expect(filelist.reject{ |v| v == false}.sort).to(eq(expect1.sort))
+      expect(filelist.reject { |v| v == false }.sort).to(eq(expect1.sort))
     end
 
     it 'returns all files based on an array' do
       filelist = entries.map { |entry| FileDependencies::Archive.eval_file(entry, extract2, prefix) }
-      expect(filelist.reject{ |v| v == false}.sort).to(eq(expect2.sort))
+      expect(filelist.reject { |v| v == false }.sort).to(eq(expect2.sort))
     end
 
     it 'returns all files when no extracted files are given' do
       filelist = entries.map { |entry| FileDependencies::Archive.eval_file(entry, extract3, prefix) }
-      expect(filelist.reject{ |v| v == false}.sort).to(eq(expect3.sort))
+      expect(filelist.reject { |v| v == false }.sort).to(eq(expect3.sort))
     end
 
   end

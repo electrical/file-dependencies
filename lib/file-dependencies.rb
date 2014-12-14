@@ -20,12 +20,12 @@ module FileDependencies
   def download(files, target, tmpdir)
     FileUtils.mkdir_p(target) unless ::File.directory?(target)
     files.each do |file|
-      target = ::File.join(target, file['target']) if !file['target'].nil?
+      target = ::File.join(target, file['target']) unless file['target'].nil?
       download = FileDependencies::File.fetch_file(file['url'], file['sha1'], tmpdir)
       if (res = download.match(/(\S+?)(\.tar\.gz|\.tgz)/))
         prefix = res.captures.first.gsub("#{tmpdir}/", '')
         FileDependencies::Archive.untar(download) do |entry|
-          next unless (out = FileDependencies::Archive.eval_file(entry, file['extract'], prefix))
+          next unless (out = FileDependencies::Archive.eval_file(entry.full_name, file['extract'], prefix))
           ::File.join(target, out)
         end
       elsif download =~ /.gz/

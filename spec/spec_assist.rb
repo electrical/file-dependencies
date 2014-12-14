@@ -1,7 +1,7 @@
 require 'stud/temporary'
 
+# :nodoc:
 module Assist
-
   def self.generate_tarball(files)
     tarpath = "#{Stud::Temporary.pathname}.tar.gz"
     tarfile = File.new(tarpath, "wb")
@@ -22,7 +22,6 @@ module Assist
   end
 
   def self.generate_gzip(content)
-
     file = "#{Stud::Temporary.pathname}.gz"
     Zlib::GzipWriter.open(file) do |gz|
       gz.write(content)

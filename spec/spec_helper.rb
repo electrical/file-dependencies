@@ -8,4 +8,3 @@ RSpec.configure do |config|
   config.extend Assist
   config.order = :random
 end
-
