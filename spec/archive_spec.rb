@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'tmpdir'
 require 'file-dependencies/archive'
 
 describe FileDependencies::Archive do
@@ -57,7 +56,7 @@ describe FileDependencies::Archive do
         end
       end
       found_files = Dir.glob(File.join(tmpdir, '**', '*')).reject { |entry| File.directory?(entry) }.sort
-      expected_files = entries.map { |k| "#{tmpdir}/#{k}" }.sort
+      expected_files = entries.map { |k| ::File.join(tmpdir, k) }.sort
       expect(expected_files).to(eq(found_files))
     end
 
@@ -72,13 +71,6 @@ describe FileDependencies::Archive do
 
   describe ".eval_file" do
 
-    # Hack to implement the full_name part
-    class ::String
-      def full_name
-        return self
-      end
-    end
-
     let(:entries) { ['sometar/PaxHeaders', 'sometar/some/dir/PaxHeaders', 'sometar/some/dir/somefile', 'sometar/somefile', 'sometar/some/other/file', 'sometar/some/jars/file1.jar', 'sometar/some/jars/file2.jar', 'sometar/other/jars/file3.jar'] }
     let(:prefix) { 'sometar' }
 
@@ -86,22 +78,15 @@ describe FileDependencies::Archive do
     let(:expect1)  { ['file1.jar', 'file2.jar', 'file3.jar'] }
     let(:extract2) { ['/some/other/file', '/somefile', '/other/jars/file3.jar'] }
     let(:expect2)  { ['file', 'somefile', 'file3.jar'] }
-    let(:extract3) {}
-    let(:expect3)  { ['/some/dir/somefile', '/somefile', '/some/other/file', '/some/jars/file1.jar', '/some/jars/file2.jar', '/other/jars/file3.jar'] }
 
     it 'returns all files based on a wildcard' do
-      filelist = entries.map { |entry| FileDependencies::Archive.eval_file(entry, extract1, prefix) }
-      expect(filelist.reject { |v| v == false }.sort).to(eq(expect1.sort))
+      filelist = entries.reject { |entry| FileDependencies::Archive.eval_file(entry, extract1, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+      expect(filelist.sort).to(eq(expect1.sort))
     end
 
     it 'returns all files based on an array' do
-      filelist = entries.map { |entry| FileDependencies::Archive.eval_file(entry, extract2, prefix) }
-      expect(filelist.reject { |v| v == false }.sort).to(eq(expect2.sort))
-    end
-
-    it 'returns all files when no extracted files are given' do
-      filelist = entries.map { |entry| FileDependencies::Archive.eval_file(entry, extract3, prefix) }
-      expect(filelist.reject { |v| v == false }.sort).to(eq(expect3.sort))
+      filelist = entries.reject { |entry| FileDependencies::Archive.eval_file(entry, extract2, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+      expect(filelist.sort).to(eq(expect2.sort))
     end
 
   end
