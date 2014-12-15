@@ -64,7 +64,7 @@ module FileDependencies
     end # def untar
     module_function :untar
 
-    def eval_file(entry, files, prefix)
+    def extract_file?(entry, files, prefix)
       return false if tar_header?(entry)
       if files.is_a?(Array)
         return true if files.include?(entry.gsub(prefix, ''))
@@ -73,7 +73,7 @@ module FileDependencies
       end
       false
     end
-    module_function :eval_file
+    module_function :extract_file?
 
     def tar_header?(entry)
       entry =~ /PaxHeaders/

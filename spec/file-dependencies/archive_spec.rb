@@ -69,7 +69,7 @@ describe FileDependencies::Archive do
     end
   end
 
-  describe ".eval_file" do
+  describe ".extract_file?" do
 
     let(:entries) { ['sometar/PaxHeaders', 'sometar/some/dir/PaxHeaders', 'sometar/some/dir/somefile', 'sometar/somefile', 'sometar/some/other/file', 'sometar/some/jars/file1.jar', 'sometar/some/jars/file2.jar', 'sometar/other/jars/file3.jar'] }
     let(:prefix) { 'sometar' }
@@ -80,12 +80,12 @@ describe FileDependencies::Archive do
     let(:expect2)  { ['file', 'somefile', 'file3.jar'] }
 
     it 'returns all files based on a wildcard' do
-      filelist = entries.reject { |entry| FileDependencies::Archive.eval_file(entry, extract1, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+      filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, extract1, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
       expect(filelist.sort).to(eq(expect1.sort))
     end
 
     it 'returns all files based on an array' do
-      filelist = entries.reject { |entry| FileDependencies::Archive.eval_file(entry, extract2, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+      filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, extract2, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
       expect(filelist.sort).to(eq(expect2.sort))
     end
 

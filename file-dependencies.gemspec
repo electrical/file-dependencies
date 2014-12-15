@@ -3,7 +3,7 @@ require File.expand_path('../lib/file-dependencies/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name = 'file-dependencies'
-  s.version = APP_VERSION
+  s.version = FileDependencies::VERSION
   s.author = 'Richard Pijnenburg'
   s.email = ['richard.pijnenburg@elasticsearch.com']
   s.summary = 'manage file dependencies for gems'
