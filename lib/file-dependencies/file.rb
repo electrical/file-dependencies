@@ -24,17 +24,17 @@ module FileDependencies
     def validate_sha1(local_file, remote_sha1)
       return true if remote_sha1 == 'none'
       sha1 = fetch_sha1(remote_sha1)
-      local_sha1 = calc_sha1(local_file)
+      local_sha1 = calculate_sha1(local_file)
 
       raise("SHA1 did not match. Expected #{sha1} but computed #{local_sha1}") if sha1 != local_sha1
       true
     end # def validate_sha1
     module_function :validate_sha1
 
-    def calc_sha1(path)
+    def calculate_sha1(path)
       Digest::SHA1.file(path).hexdigest
     end # def calc__sha1
-    module_function :calc_sha1
+    module_function :calculate_sha1
 
     def fetch_file(url, sha1, target)
       puts "Downloading #{url}" if $DEBUG

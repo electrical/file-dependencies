@@ -5,7 +5,7 @@ require 'file-dependencies'
 include WebMock::API
 describe FileDependencies do
 
-  describe '.download' do
+  describe '.process_downloads' do
     after do
       [tmpdir, target, file1, file2, file3, file4].each do |entry|
         FileUtils.remove_entry_secure(entry)
@@ -20,10 +20,10 @@ describe FileDependencies do
     let(:file3) { Assist.generate_gzip('some_content_for_gzip') }
     let(:file4) { Assist.generate_tarball('jars/some.jar' => 'content10', 'jars/someother.jar' => 'content11') }
 
-    let(:sha1) { FileDependencies::File.calc_sha1(file1) }
-    let(:sha2) { FileDependencies::File.calc_sha1(file2) }
-    let(:sha3) { FileDependencies::File.calc_sha1(file3) }
-    let(:sha4) { FileDependencies::File.calc_sha1(file4) }
+    let(:sha1) { FileDependencies::File.calculate_sha1(file1) }
+    let(:sha2) { FileDependencies::File.calculate_sha1(file2) }
+    let(:sha3) { FileDependencies::File.calculate_sha1(file3) }
+    let(:sha4) { FileDependencies::File.calculate_sha1(file4) }
 
     let(:url1) { 'http://www.example.com/somefile1.tar.gz' }
     let(:url2) { 'http://www.example.com/somefile2.txt' }
@@ -41,7 +41,7 @@ describe FileDependencies do
       stub_request(:get, url4).to_return(:body => File.new(file4), :status => 200)
      
       # we should not have any errors
-      expect { FileDependencies.download(files, target, tmpdir) }.to_not(raise_error)
+      expect { FileDependencies.process_downloads(files, target, tmpdir) }.to_not(raise_error)
 
       # check if we got all the expected files
       found_files = Dir.glob(File.join(target, '**', '*')).reject { |entry| File.directory?(entry) }.sort
@@ -66,10 +66,10 @@ describe FileDependencies do
     let(:file3) { Assist.generate_gzip('some_content_for_gzip') }
     let(:file4) { Assist.generate_tarball('jars/some.jar' => 'content10', 'jars/someother.jar' => 'content11') }
 
-    let(:sha1) { FileDependencies::File.calc_sha1(file1) }
-    let(:sha2) { FileDependencies::File.calc_sha1(file2) }
-    let(:sha3) { FileDependencies::File.calc_sha1(file3) }
-    let(:sha4) { FileDependencies::File.calc_sha1(file4) }
+    let(:sha1) { FileDependencies::File.calculate_sha1(file1) }
+    let(:sha2) { FileDependencies::File.calculate_sha1(file2) }
+    let(:sha3) { FileDependencies::File.calculate_sha1(file3) }
+    let(:sha4) { FileDependencies::File.calculate_sha1(file4) }
 
     let(:url1) { 'http://www.example.com/somefile1.tar.gz' }
     let(:url2) { 'http://www.example.com/somefile2.txt' }
