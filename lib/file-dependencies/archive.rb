@@ -67,25 +67,23 @@ module FileDependencies
     def extract_file?(entry, extract=nil, exclude=nil, prefix)
       return false if tar_header?(entry)
 
-      if !extract.nil?
-        return true if match?(entry, extract, prefix)
-        return false
-      elsif !exclude.nil?
-        return false if match?(entry, exclude, prefix)
-        return true
+      if extract
+        return match?(entry, extract, prefix)
+      elsif exclude
+        return !match?(entry, exclude, prefix)
       end
     end
     module_function :extract_file?
 
     def match?(entry, list, prefix)
-      if !list.nil?
-        if list.is_a?(Array)
-          list.each do |pattern|
-            if pattern.is_a?(Regexp) or pattern.to_s.match('^\(\?-mix:.+\)$')
-              return true if entry =~ Regexp.new(pattern)
-            elsif pattern.is_a?(String)
-              return true if pattern == entry.gsub(prefix, '')
-            end
+      return false if list.nil?
+
+      if list.is_a?(Array)
+        list.each do |pattern|
+          if pattern.is_a?(Regexp) or regexp_string?(pattern)
+            return true if entry =~ Regexp.new(pattern)
+          elsif pattern.is_a?(String)
+            return true if pattern == entry.gsub(prefix, '')
           end
         end
       end
@@ -97,5 +95,10 @@ module FileDependencies
       entry =~ /PaxHeaders/
     end
     module_function :tar_header?
+
+    def regexp_string?(pattern)
+      pattern.to_s.match('^\(\?-mix:.+\)$')
+    end
+    module_function :regexp_string?
   end
 end
