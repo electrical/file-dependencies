@@ -64,16 +64,34 @@ module FileDependencies
     end # def untar
     module_function :untar
 
-    def extract_file?(entry, files, prefix)
+    def extract_file?(entry, extract=nil, exclude=nil, prefix)
       return false if tar_header?(entry)
-      if files.is_a?(Array)
-        return true if files.include?(entry.gsub(prefix, ''))
-      elsif files.is_a?(String)
-        return true if entry =~ Regexp.new(files)
+
+      if !extract.nil?
+        return true if match?(entry, extract, prefix)
+        return false
+      elsif !exclude.nil?
+        return false if match?(entry, exclude, prefix)
+        return true
+      end
+    end
+    module_function :extract_file?
+
+    def match?(entry, list, prefix)
+      if !list.nil?
+        if list.is_a?(Array)
+          list.each do |pattern|
+            if pattern.is_a?(Regexp) or pattern.to_s.match('^\(\?-mix:.+\)$')
+              return true if entry =~ Regexp.new(pattern)
+            elsif pattern.is_a?(String)
+              return true if pattern == entry.gsub(prefix, '')
+            end
+          end
+        end
       end
       false
     end
-    module_function :extract_file?
+    module_function :match?
 
     def tar_header?(entry)
       entry =~ /PaxHeaders/
