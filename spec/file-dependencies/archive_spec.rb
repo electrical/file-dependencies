@@ -71,22 +71,62 @@ describe FileDependencies::Archive do
 
   describe ".extract_file?" do
 
-    let(:entries) { ['sometar/PaxHeaders', 'sometar/some/dir/PaxHeaders', 'sometar/some/dir/somefile', 'sometar/somefile', 'sometar/some/other/file', 'sometar/some/jars/file1.jar', 'sometar/some/jars/file2.jar', 'sometar/other/jars/file3.jar'] }
-    let(:prefix) { 'sometar' }
+    describe "with extract" do
 
-    let(:extract1) { '.jars' }
-    let(:expect1)  { ['file1.jar', 'file2.jar', 'file3.jar'] }
-    let(:extract2) { ['/some/other/file', '/somefile', '/other/jars/file3.jar'] }
-    let(:expect2)  { ['file', 'somefile', 'file3.jar'] }
+      let(:entries) { ['sometar/PaxHeaders', 'sometar/some/dir/PaxHeaders', 'sometar/some/dir/somefile', 'sometar/somefile', 'sometar/some/other/file', 'sometar/some/jars/file1.jar', 'sometar/some/jars/file2.jar', 'sometar/other/jars/file3.jar'] }
+      let(:prefix) { 'sometar' }
 
-    it 'returns all files based on a wildcard' do
-      filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, extract1, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
-      expect(filelist.sort).to(eq(expect1.sort))
+      let(:extract1) { [/.jar/] }
+      let(:expect1)  { ['file1.jar', 'file2.jar', 'file3.jar'] }
+      let(:extract2) { ['/some/other/file', '/somefile', '/other/jars/file3.jar'] }
+      let(:expect2)  { ['file', 'somefile', 'file3.jar'] }
+      let(:extract3) { [/\/some\/jars/, /^sometar\/other/] }
+      let(:expect3)  { ['file1.jar', 'file2.jar', 'file3.jar'] }
+
+      it 'returns all files based on a regex' do
+        filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, extract1, '', prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+        expect(filelist.sort).to(eq(expect1.sort))
+      end
+
+      it 'returns all files based on an array' do
+        filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, extract2, '', prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+        expect(filelist.sort).to(eq(expect2.sort))
+      end
+
+      it 'returns all files from directories' do
+        filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, extract3, '',  prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+        expect(filelist.sort).to(eq(expect3.sort))
+      end
+
     end
 
-    it 'returns all files based on an array' do
-      filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, extract2, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
-      expect(filelist.sort).to(eq(expect2.sort))
+    describe "with exclude" do
+
+      let(:entries) { ['sometar/PaxHeaders', 'sometar/some/dir/PaxHeaders', 'sometar/some/dir/somefile', 'sometar/somefile', 'sometar/some/other/file', 'sometar/some/jars/file1.jar', 'sometar/some/jars/file2.jar', 'sometar/other/jars/file3.jar'] }
+      let(:prefix) { 'sometar' }
+
+      let(:extract1) { [/.jar/] }
+      let(:expect1)  { ["file", "somefile", "somefile"] }
+      let(:extract2) { ['/some/other/file', '/somefile', '/other/jars/file3.jar'] }
+      let(:expect2)  { ['file1.jar', 'file2.jar', 'somefile'] }
+      let(:extract3) { [/^sometar\/some\/jars/, /^sometar\/other/] }
+      let(:expect3)  { ['somefile', 'somefile', 'file'] }
+
+      it 'returns all non matching files based on a regex' do
+        filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, nil, extract1, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+        expect(filelist.sort).to(eq(expect1.sort))
+      end
+
+      it 'returns all non matching files based on an array' do
+        filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, nil, extract2, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+        expect(filelist.sort).to(eq(expect2.sort))
+      end
+
+      it 'returns all except the directories' do
+        filelist = entries.reject { |entry| FileDependencies::Archive.extract_file?(entry, nil, extract3, prefix) == false }.map { |entry| entry.gsub(prefix, '').split("/").last }
+        expect(filelist.sort).to(eq(expect3.sort))
+      end
+
     end
 
   end
