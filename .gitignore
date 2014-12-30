@@ -6,3 +6,4 @@ pkg
 target
 build.log
 *.swp
+coverage/
