@@ -65,6 +65,7 @@ module FileDependencies
     module_function :untar
 
     def extract_file?(entry, extract=nil, exclude=nil, prefix)
+      return true if extract.nil? && exclude.nil?
       return false if tar_header?(entry)
 
       if extract

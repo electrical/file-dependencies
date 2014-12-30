@@ -20,26 +20,22 @@ module FileDependencies
   def process_downloads(files, target, tmpdir)
     FileUtils.mkdir_p(target) unless ::File.directory?(target)
     files.each do |file|
-      target = ::File.join(target, file['target']) unless file['target'].nil?
+      full_target = file['target'] ? ::File.join(target, file['target']) : target
       download = FileDependencies::File.fetch_file(file['url'], file['sha1'], tmpdir)
       if (res = download.match(/(\S+?)(\.tar\.gz|\.tgz)$/))
         prefix = res.captures.first.gsub("#{tmpdir}/", '')
         FileDependencies::Archive.untar(download) do |entry|
-          if file['extract'].nil? and file['exclude'].nil?
-            ::File.join(target, entry.full_name.gsub(prefix, ''))
+          next unless FileDependencies::Archive.extract_file?(entry.full_name, file['extract'], file['exclude'], prefix)
+          if file['flatten'] == true
+            ::File.join(full_target, entry.full_name.split("/").last)
           else
-            next unless FileDependencies::Archive.extract_file?(entry.full_name, file['extract'], file['exclude'], prefix)
-            if file['target'].nil?
-              ::File.join(target, entry.full_name.gsub(prefix, ''))
-            else
-              ::File.join(target, entry.full_name.split("/").last)
-            end
+            ::File.join(full_target, entry.full_name.gsub(prefix, ''))
           end
         end
       elsif download =~ /.gz$/
-        FileDependencies::Archive.ungzip(download, target)
+        FileDependencies::Archive.ungzip(download, full_target)
       else
-        FileUtils.mv(download, ::File.join(target, download.split("/").last))
+        FileUtils.mv(download, ::File.join(full_target, download.split("/").last))
       end
     end
   end # def download
