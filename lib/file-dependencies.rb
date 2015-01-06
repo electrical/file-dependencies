@@ -27,7 +27,7 @@ module FileDependencies
           prefix = file['include_tar_prefix'] ? '' : ::File.join(entry.full_name.split(::File::SEPARATOR).first, '')
           next unless FileDependencies::Archive.extract_file?(entry.full_name, file['extract'], file['exclude'], prefix)
           if file['flatten'] == true
-            ::File.join(full_target, entry.full_name.split(::File::SEPARATOR).last)
+            ::File.join(full_target, ::File.basename(entry.full_name))
           else
             ::File.join(full_target, entry.full_name.gsub(prefix, ''))
           end
@@ -35,7 +35,7 @@ module FileDependencies
       elsif download =~ /.gz$/
         FileDependencies::Archive.ungzip(download, full_target)
       else
-        FileUtils.mv(download, ::File.join(full_target, download.split(::File::SEPARATOR).last))
+        FileUtils.mv(download, ::File.join(full_target, ::File.basename(download)))
       end
     end
   end # def download
