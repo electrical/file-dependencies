@@ -15,11 +15,11 @@ describe FileDependencies do
     let(:tmpdir) { Stud::Temporary.directory }
     let(:target) { Stud::Temporary.directory }
 
-    let(:file1) { Assist.generate_tarball('some/file' => 'content1', 'some/other/file' => 'content2', 'other' => 'content3') }
+    let(:file1) { Assist.generate_tarball('somefile1/some/file' => 'content1', 'somefile1/some/other/file' => 'content2', 'somefile1/other' => 'content3') }
     let(:file2) { Assist.generate_file('some_content') }
     let(:file3) { Assist.generate_gzip('some_content_for_gzip') }
     let(:file4) { Assist.generate_tarball('jars/some.jar' => 'content10', 'jars/someother.jar' => 'content11', 'somefile.txt' => 'bla') }
-    let(:file5) { Assist.generate_tarball('src/types.db' => 'typesdb') }
+    let(:file5) { Assist.generate_tarball('mytarball/src/types.db' => 'typesdb') }
 
     let(:sha1) { FileDependencies::File.calculate_sha1(file1) }
     let(:sha2) { FileDependencies::File.calculate_sha1(file2) }
@@ -35,7 +35,7 @@ describe FileDependencies do
 
     let(:entries) { ['somefile2.txt', 'somefile3', 'some/file', 'some/other/file', 'other', 'jarfiles/jars/some.jar', 'jarfiles/jars/someother.jar', 'jarfiles/somefile.txt', 'types.db'] }
 
-    let(:files) { [{ 'url' => url1, 'sha1' => sha1 }, { 'url' => url2, 'sha1' => sha2 }, { 'url' => url3, 'sha1' => sha3 }, { 'url' => url4, 'sha1' => sha4, 'extract' => [/\.jar/, /\.txt/], 'target' => 'jarfiles' }, { 'url' => url5, 'sha1' => sha5, 'flatten' => true }] }
+    let(:files) { [{ 'url' => url1, 'sha1' => sha1 }, { 'url' => url2, 'sha1' => sha2 }, { 'url' => url3, 'sha1' => sha3 }, { 'url' => url4, 'sha1' => sha4, 'extract' => [/\.jar/, /\.txt/], 'target' => 'jarfiles', 'include_tar_prefix' => true }, { 'url' => url5, 'sha1' => sha5, 'flatten' => true }] }
 
     it 'processes file list' do
       stub_request(:get, url1).to_return(:body => File.new(file1), :status => 200)
@@ -65,11 +65,11 @@ describe FileDependencies do
     let(:tmpdir) { Stud::Temporary.directory }
     let(:target) { Stud::Temporary.directory }
 
-    let(:file1) { Assist.generate_tarball('some/file' => 'content1', 'some/other/file' => 'content2', 'other' => 'content3') }
+    let(:file1) { Assist.generate_tarball('somefile1/some/file' => 'content1', 'somefile1/some/other/file' => 'content2', 'somefile1/other' => 'content3') }
     let(:file2) { Assist.generate_file('some_content') }
     let(:file3) { Assist.generate_gzip('some_content_for_gzip') }
     let(:file4) { Assist.generate_tarball('jars/some.jar' => 'content10', 'jars/someother.jar' => 'content11', 'somefile.txt' => 'bla') }
-    let(:file5) { Assist.generate_tarball('src/types.db' => 'typesdb') }
+    let(:file5) { Assist.generate_tarball('mytarball/src/types.db' => 'typesdb') }
 
     let(:sha1) { FileDependencies::File.calculate_sha1(file1) }
     let(:sha2) { FileDependencies::File.calculate_sha1(file2) }
@@ -83,7 +83,7 @@ describe FileDependencies do
     let(:url4) { 'http://www.example.com/somefile4.tar.gz' }
     let(:url5) { 'http://www.example.com/somefile5.tar.gz' }
 
-    let(:files) { [{ 'url' => url1, 'sha1' => sha1 }, { 'url' => url2, 'sha1' => sha2 }, { 'url' => url3, 'sha1' => sha3 }, { 'url' => url4, 'sha1' => sha4, 'extract' => [/\.jar/, /\.txt/], 'target' => 'jarfiles' }, { 'url' => url5, 'sha1' => sha5, 'flatten' => true }].to_json }
+    let(:files) { [{ 'url' => url1, 'sha1' => sha1 }, { 'url' => url2, 'sha1' => sha2 }, { 'url' => url3, 'sha1' => sha3 }, { 'url' => url4, 'sha1' => sha4, 'extract' => [/\.jar/, /\.txt/], 'target' => 'jarfiles', 'include_tar_prefix' => true }, { 'url' => url5, 'sha1' => sha5, 'flatten' => true }].to_json }
 
     let(:vendorfile) { File.write(File.join(target, 'vendor.json'), files) }
     let(:entries) { ['somefile2.txt', 'somefile3', 'some/file', 'some/other/file', 'other', 'jarfiles/jars/some.jar', 'jarfiles/jars/someother.jar', 'jarfiles/somefile.txt', 'types.db'] }
