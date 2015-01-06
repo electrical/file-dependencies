@@ -5,7 +5,7 @@ module FileDependencies
   # :nodoc:
   module Archive
     def ungzip(file, outdir)
-      output = ::File.join(outdir, file.gsub('.gz', '').split("/").last)
+      output = ::File.join(outdir, file.gsub('.gz', '').split(::File::SEPARATOR).last)
       tgz = Zlib::GzipReader.new(::File.open(file))
       begin
         ::File.open(output, "w") do |out|
