@@ -7,3 +7,5 @@ target
 build.log
 *.swp
 coverage/
+.bundle
+.vendor
