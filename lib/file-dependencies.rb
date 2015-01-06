@@ -12,7 +12,7 @@ module FileDependencies
       file_list = JSON.load(vendor_file_content)
       FileDependencies.process_downloads(file_list, ::File.join(dir, target), tmpdir)
     else
-      puts "vendor.json not found, looked for the file at #{vendor_file}"
+      puts "vendor.json not found, looked for the file at #{vendor_file}" if $DEBUG
     end
   end # def process_vendor
   module_function :process_vendor
@@ -23,8 +23,8 @@ module FileDependencies
       full_target = file['target'] ? ::File.join(target, file['target']) : target
       download = FileDependencies::File.fetch_file(file['url'], file['sha1'], tmpdir)
       if (res = download.match(/(\S+?)(\.tar\.gz|\.tgz)$/))
-        prefix = res.captures.first.gsub("#{tmpdir}/", '')
         FileDependencies::Archive.untar(download) do |entry|
+          prefix = file['include_tar_prefix'] ? '' : ::File.join(entry.full_name.split("/").first, '')
           next unless FileDependencies::Archive.extract_file?(entry.full_name, file['extract'], file['exclude'], prefix)
           if file['flatten'] == true
             ::File.join(full_target, entry.full_name.split("/").last)
