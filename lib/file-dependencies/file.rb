@@ -46,7 +46,7 @@ module FileDependencies
 
     def download(url, target)
       uri = URI(url)
-      output = "#{target}/#{::File.basename(uri.path)}"
+      output = ::File.join(target, ::File.basename(uri.path))
       tmp = "#{output}.tmp"
       Net::HTTP.start(uri.host, uri.port, :use_ssl => (uri.scheme == "https")) do |http|
         request = Net::HTTP::Get.new(uri.path)
