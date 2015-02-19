@@ -1,3 +1,3 @@
 require 'file-dependencies/gem'
 
-#FileDependencies::Gem.hook
+FileDependencies::Gem.hook
