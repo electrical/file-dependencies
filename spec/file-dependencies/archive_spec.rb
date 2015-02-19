@@ -7,7 +7,7 @@ describe FileDependencies::Archive do
 
     after do
       FileUtils.remove_entry_secure(gzipfile) if ::File.exist?(gzipfile)
-      FileUtils.remove_entry_secure(expected_file)
+      FileUtils.remove_entry_secure(expected_file) if ::File.exist?(expected_file)
       FileUtils.remove_entry_secure(tmpdir)
     end
     let(:gzipfile) { Assist.generate_gzip('some_content') }
@@ -29,7 +29,7 @@ describe FileDependencies::Archive do
 
     after do
       FileUtils.remove_entry_secure(tmpdir)
-      FileUtils.remove_entry_secure(file)
+      FileUtils.remove_entry_secure(file) if ::File.file?(file)
     end
 
     let(:file) { Assist.generate_file('some_content') }
